@@ -58,6 +58,8 @@ class Game():
     def __init__(self, width, height):
         pygame.init()
         self.board = Board(width, height)
+        self.player1 = Player(x=300, y=300)
+        self.bug = Ladybug(x=100, y=100)
         # the clock with we will use to control the speed off drawing
         # consecutive frames of the game
         self.fps_clock = pygame.time.Clock()
@@ -68,7 +70,10 @@ class Game():
         Main program loop.
         """
         while not self.handle_events():
-            self.board.draw()
+            self.board.draw(
+                self.player1,
+                self.bug
+            )
     # loop until receiving a signal to output.
 
     def handle_events(self):
@@ -81,19 +86,60 @@ class Game():
                 return True
             pygame.key.get_pressed()
 
+    def blit(graphics, param):
+        pass
 
-# class Player():
+# class Drawable(object):
+#     """
+#     Base class for drawn objects
+#     """
 #
-#     def __init__(self):
+#     def __init__(self, width, height, x, y, color=(0, 255, 0)):
+#         self.width = width
+#         self.height = height
+#         self.surface = pygame.Surface([width, height], pygame.SRCALPHA, 32).convert_alpha()
+#         self.rect = self.surface.get_rect(x=x, y=y)
 #
-#     def move(self):
-#
-#
-# class Ladybug():
-#
-#     def __init__(self):
-#
-#     def move(self):
+#     def draw_on(self, surface):
+#         surface.blit(self.surface, self.rect)
+
+
+class Player(object):
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.height = 50
+        self.width = 50
+        self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.graphics = pygame.image.load(os.path.join('playerbug.png'))
+
+    def draw_on(self, surface):
+        surface.blit(self.graphics, (self.x, self.y))
+
+    def move(self, v):
+        self.y = self.y + v
+        self.x = self.x + v
+        self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
+
+
+class Ladybug(object):
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.height = 50
+        self.width = 50
+        self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.graphics = pygame.image.load(os.path.join('ladybug.png'))
+
+    def draw_on(self, surface):
+        surface.blit(self.graphics, (self.x, self.y))
+
+    def move(self, v):
+        self.y = self.y + v
+        self.x = self.x + v
+        self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
 #
 # class Judge():
 
