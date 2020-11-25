@@ -50,7 +50,7 @@ class Board(object):
         surface.blit(text, rect)
 
 
-class Game():
+class Game(object):
     """
     Brings all the elements of the game together.
     """
@@ -81,10 +81,34 @@ class Game():
                 Handling system events.
                 """
         for event in pygame.event.get():
+            step = 8
             if event.type == pygame.locals.QUIT:
                 pygame.quit()
                 return True
             pygame.key.get_pressed()
+            if event.type == pygame.KEYDOWN:
+                poz_x = self.player1.x
+                poz_y = self.player1.y
+                if event.key == pygame.K_LEFT:
+                    self.player1.x -= step
+                    if self.player1.x < 0:
+                        self.player1.x = 0
+                elif event.key == pygame.K_RIGHT:
+                    self.player1.x += step
+                    if self.player1.x > 600 - (self.player1.width)/2:
+                        self.player1.x = 600 - (self.player1.width)/2
+                if event.key == pygame.K_UP:
+                    self.player1.y -= step
+                    if self.player1.y < 0:
+                        self.player1.y = 0
+                elif event.key == pygame.K_DOWN:
+                    self.player1.y += step
+                    if self.player1.y > 600 - (self.player1.height)/2:
+                        self.player1.y = 600 - (self.player1.height)/2
+                    # self.player1.move(step)
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    quit()
 
     def blit(graphics, param):
         pass
