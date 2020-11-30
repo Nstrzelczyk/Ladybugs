@@ -57,9 +57,11 @@ class Game(object):
 
     def __init__(self, width, height):
         pygame.init()
+        self.width = width
+        self.height = height
         self.board = Board(width, height)
-        self.player1 = Player(x=300, y=300)
-        self.bug = Ladybug(x=100, y=100)
+        self.player1 = Player(x=width/2, y=height/2)
+        self.bug = Ladybug(x=random.randint(0, self.width), y=random.randint(0, self.height))
         # the clock with we will use to control the speed off drawing
         # consecutive frames of the game
         self.fps_clock = pygame.time.Clock()
@@ -95,16 +97,16 @@ class Game(object):
                         self.player1.x = 0
                 elif event.key == pygame.K_RIGHT:
                     self.player1.x += step
-                    if self.player1.x > 600 - (self.player1.width)/2:
-                        self.player1.x = 600 - (self.player1.width)/2
+                    if self.player1.x > self.width - self.player1.width/2:
+                        self.player1.x = self.width - self.player1.width/2
                 if event.key == pygame.K_UP:
                     self.player1.y -= step
                     if self.player1.y < 0:
                         self.player1.y = 0
                 elif event.key == pygame.K_DOWN:
                     self.player1.y += step
-                    if self.player1.y > 600 - (self.player1.height)/2:
-                        self.player1.y = 600 - (self.player1.height)/2
+                    if self.player1.y > self.height - self.player1.height/2:
+                        self.player1.y = self.height - self.player1.height/2
                     # self.player1.move(step)
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
@@ -112,20 +114,6 @@ class Game(object):
 
     def blit(graphics, param):
         pass
-
-# class Drawable(object):
-#     """
-#     Base class for drawn objects
-#     """
-#
-#     def __init__(self, width, height, x, y, color=(0, 255, 0)):
-#         self.width = width
-#         self.height = height
-#         self.surface = pygame.Surface([width, height], pygame.SRCALPHA, 32).convert_alpha()
-#         self.rect = self.surface.get_rect(x=x, y=y)
-#
-#     def draw_on(self, surface):
-#         surface.blit(self.surface, self.rect)
 
 
 class Player(object):
