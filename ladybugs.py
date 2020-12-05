@@ -33,7 +33,7 @@ class Board(object):
 
         :param args: list of object to draw
         """
-        background = (100, 50, 205)
+        background = (40, 120, 40)
         self.surface.fill(background)
         for drawable in args:
             drawable.draw_on(self.surface)
@@ -61,7 +61,7 @@ class Game(object):
         self.height = height
         self.board = Board(width, height)
         self.player1 = Player(x=width/2, y=height/2)
-        self.bug = Ladybug(x=random.randint(0, self.width), y=random.randint(0, self.height))
+        self.bug = Ladybug(x=random.randint(0, self.width), y=random.randint(50, self.height - 50), vx=random.randint(-4, 4), vy=random.randint(-4, 4))
         # the clock with we will use to control the speed off drawing
         # consecutive frames of the game
         self.fps_clock = pygame.time.Clock()
@@ -112,7 +112,7 @@ class Game(object):
                     pygame.quit()
                     quit()
 
-    def blit(graphics, param):
+    def blit(self, graphics, param):
         pass
 
 
@@ -137,21 +137,30 @@ class Player(object):
 
 class Ladybug(object):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, vx, vy):
         self.x = x
         self.y = y
         self.height = 50
         self.width = 50
+        self.vx = vx
+        self.vy = vy
         self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
         self.graphics = pygame.image.load(os.path.join('ladybug.png'))
 
     def draw_on(self, surface):
         surface.blit(self.graphics, (self.x, self.y))
 
-    def move(self, v):
-        self.y = self.y + v
-        self.x = self.x + v
-        self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
+    def move(self):
+        self.x += self.vx
+        self.y += self.vy
+        if self.x <= 0 or self.x >= game.width:
+            self.vx *= -1
+        if self.y <= 0 or self.y >= game.height:
+            self.vy *= -1
+        # self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
+
+    # def collision(self, player):
+        
 #
 # class Judge():
 
