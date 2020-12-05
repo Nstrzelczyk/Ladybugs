@@ -89,8 +89,6 @@ class Game(object):
                 return True
             pygame.key.get_pressed()
             if event.type == pygame.KEYDOWN:
-                poz_x = self.player1.x
-                poz_y = self.player1.y
                 if event.key == pygame.K_LEFT:
                     self.player1.x -= step
                     if self.player1.x < 0:
@@ -159,8 +157,11 @@ class Ladybug(object):
             self.vy *= -1
         # self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    # def collision(self, player):
-        
+    def collision(self, player):
+        if self.shape.colliderect(player):
+            return True
+        else:
+            return False
 #
 # class Judge():
 
