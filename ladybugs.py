@@ -54,14 +54,17 @@ class Game(object):
     """
     Brings all the elements of the game together.
     """
-
-    def __init__(self, width, height):
+    def __init__(self, width, height,display):
         pygame.init()
         self.width = width
         self.height = height
+        self.display = display
         self.board = Board(width, height)
         self.player1 = Player(x=width/2, y=height/2)
+        self.player_start = Player(x=width/3, y=height/4)
+        self.bug_start = Ladybug(x=width*2/3, y=height/4, vx=0, vy=0)
         self.bug = Ladybug(x=random.randint(0, self.width), y=random.randint(50, self.height - 50), vx=random.randint(-4, 4), vy=random.randint(-4, 4))
+        # self.start_text = Board.draw_text(self.board, surface=self.board.surface, text="To star the game press space", x=width/2, y=height/2)
         # the clock with we will use to control the speed off drawing
         # consecutive frames of the game
         self.fps_clock = pygame.time.Clock()
@@ -72,10 +75,23 @@ class Game(object):
         Main program loop.
         """
         while not self.handle_events():
-            self.board.draw(
-                self.player1,
-                self.bug
-            )
+            if self.display == "Menu":
+                self.board.draw(
+                    self.player_start,
+                    self.bug_start
+                    # self.start_text
+                )
+
+            elif self.display == "Play game":
+                self.board.draw(
+                    self.player1,
+                    self.bug
+                )
+            elif self.display == "End":
+                self.board.draw(
+                    self.player_start,
+                    self.bug_start
+                )
     # loop until receiving a signal to output.
 
     def handle_events(self):
@@ -105,10 +121,14 @@ class Game(object):
                     self.player1.y += step
                     if self.player1.y > self.height - self.player1.height/2:
                         self.player1.y = self.height - self.player1.height/2
-                    # self.player1.move(step)
+                if event.key == pygame.K_SPACE:
+                    if self.display != "Play game":
+                        self.display = "Play game"
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
+        if self.bug.collision(self.player1.shape):
+            self.display = "End"
 
     def blit(self, graphics, param):
         pass
@@ -168,5 +188,5 @@ class Ladybug(object):
 
 # This part should always be at the end of the module, we want to start our game only after all classes are declared.
 if __name__ == "__main__":
-    game = Game(600, 600)
+    game = Game(600, 600, "Menu")
     game.run()
