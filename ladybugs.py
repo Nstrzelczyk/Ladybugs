@@ -27,6 +27,8 @@ class Board(object):
         font_path = pygame.font.match_font('arial')
         self.font = pygame.font.Font(font_path, 64)
 
+
+
     def draw(self, *args):
         """
         Draws the game windows
@@ -40,14 +42,32 @@ class Board(object):
 
         pygame.display.update()
 
+
+class Text(object):
+
+    def __init__(self, board):
+        self.board = board
+        # Font PyGame
+        pygame.font.init()
+        font_path = pygame.font.match_font('arial')
+        self.font = pygame.font.Font(font_path, 48)
+
     def draw_text(self, surface, text, x, y):
         """
         Draws the indicated text at the indicated location
         """
-        text = self.font.render(text, True, (150, 150, 150))
+        text = self.font.render(text, True, (200, 150, 150))
         rect = text.get_rect()
         rect.center = x, y
         surface.blit(text, rect)
+
+    def draw_on(self, surface):
+        """
+        Draws the indicated text at the indicated location.
+        """
+        height = self.board.surface.get_height()
+        width = self.board.surface.get_width()
+        self.draw_text(surface, "Press SPACE to start", width/2, height/2)
 
 
 class Game(object):
@@ -63,8 +83,14 @@ class Game(object):
         self.player1 = Player(x=width/2, y=height/2)
         self.player_start = Player(x=width/3, y=height/4)
         self.bug_start = Ladybug(x=width*2/3, y=height/4, vx=0, vy=0)
-        self.bug = Ladybug(x=random.randint(0, self.width), y=random.randint(50, self.height - 50), vx=random.randint(-4, 4), vy=random.randint(-4, 4))
-        # self.start_text = Board.draw_text(self.board, surface=self.board.surface, text="To star the game press space", x=width/2, y=height/2)
+        self.start_text = Text(self.board)
+        self.invasion = []
+        for i in range(5):
+            self.bug = Ladybug(x=random.randint(0, self.width), y=random.randint(50, self.height - 50),
+                               vx=random.randint(-4, 4), vy=random.randint(-4, 4))
+            self.invasion.append(self.bug)
+
+
         # the clock with we will use to control the speed off drawing
         # consecutive frames of the game
         self.fps_clock = pygame.time.Clock()
@@ -78,14 +104,17 @@ class Game(object):
             if self.display == "Menu":
                 self.board.draw(
                     self.player_start,
-                    self.bug_start
-                    # self.start_text
+                    self.bug_start,
+                    self.start_text
                 )
-
             elif self.display == "Play game":
                 self.board.draw(
                     self.player1,
-                    self.bug
+                    self.invasion[0],
+                    self.invasion[1],
+                    self.invasion[2],
+                    self.invasion[3],
+                    self.invasion[4]
                 )
             elif self.display == "End":
                 self.board.draw(
@@ -128,6 +157,8 @@ class Game(object):
                     pygame.quit()
                     quit()
         if self.bug.collision(self.player1.shape):
+            self.player1 = self.player_start
+            self.bug = self.bug_start
             self.display = "End"
 
     def blit(self, graphics, param):
@@ -150,7 +181,6 @@ class Player(object):
     def move(self, v):
         self.y = self.y + v
         self.x = self.x + v
-        self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
 
 
 class Ladybug(object):
@@ -175,7 +205,7 @@ class Ladybug(object):
             self.vx *= -1
         if self.y <= 0 or self.y >= game.height:
             self.vy *= -1
-        # self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
+
 
     def collision(self, player):
         if self.shape.colliderect(player):
