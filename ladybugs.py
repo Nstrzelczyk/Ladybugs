@@ -16,7 +16,6 @@ class Board(object):
     def __init__(self, width, height):
         """
         Game board constructor.
-
         :param width:
         :param height:
         """
@@ -27,12 +26,9 @@ class Board(object):
         font_path = pygame.font.match_font('arial')
         self.font = pygame.font.Font(font_path, 64)
 
-
-
     def draw(self, *args):
         """
         Draws the game windows
-
         :param args: list of object to draw
         """
         background = (40, 120, 40)
@@ -45,8 +41,9 @@ class Board(object):
 
 class Text(object):
 
-    def __init__(self, board):
+    def __init__(self, board, text):
         self.board = board
+        self.text = text
         # Font PyGame
         pygame.font.init()
         font_path = pygame.font.match_font('arial')
@@ -67,7 +64,7 @@ class Text(object):
         """
         height = self.board.surface.get_height()
         width = self.board.surface.get_width()
-        self.draw_text(surface, "Press SPACE to start", width/2, height/2)
+        self.draw_text(surface, self.text, width/2, height/2)
 
 
 class Game(object):
@@ -83,13 +80,13 @@ class Game(object):
         self.player1 = Player(x=width/2, y=height/2)
         self.player_start = Player(x=width/3, y=height/4)
         self.bug_start = Ladybug(x=width*2/3, y=height/4, vx=0, vy=0)
-        self.start_text = Text(self.board)
+        self.start_text = Text(self.board, "Press SPACE to start")
+        self.end_text = Text(self.board, "Game over\nPress SPACE to start")
         self.invasion = []
         for i in range(5):
-            self.bug = Ladybug(x=random.randint(0, self.width), y=random.randint(50, self.height - 50),
+            self.bug = Ladybug(x=random.randint(0, self.width - 50), y=random.randint(50, self.height - 50),
                                vx=random.randint(-4, 4), vy=random.randint(-4, 4))
             self.invasion.append(self.bug)
-
 
         # the clock with we will use to control the speed off drawing
         # consecutive frames of the game
@@ -116,17 +113,21 @@ class Game(object):
                     self.invasion[3],
                     self.invasion[4]
                 )
+                for self.Ladybug in self.invasion:
+                    self.Ladybug.move()
+                pygame.time.wait(10)
             elif self.display == "End":
                 self.board.draw(
                     self.player_start,
-                    self.bug_start
+                    self.bug_start,
+                    self.end_text
                 )
     # loop until receiving a signal to output.
 
     def handle_events(self):
         """
-                Handling system events.
-                """
+        Handling system events.
+        """
         for event in pygame.event.get():
             step = 8
             if event.type == pygame.locals.QUIT:
@@ -156,9 +157,8 @@ class Game(object):
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     quit()
+
         if self.bug.collision(self.player1.shape):
-            self.player1 = self.player_start
-            self.bug = self.bug_start
             self.display = "End"
 
     def blit(self, graphics, param):
@@ -197,6 +197,14 @@ class Ladybug(object):
 
     def draw_on(self, surface):
         surface.blit(self.graphics, (self.x, self.y))
+        # if self.x < self.width:
+        #     self.x = self.width/2
+        # elif self.x > game.width - self.width/2:
+        #     self.x = game.width - self.width/2
+        # elif self.y < self.height:
+        #     self.y = self.height/2
+        # elif self.y > game.height - self.height/2:
+        #     self.y = game.height - self.height/2
 
     def move(self):
         self.x += self.vx
@@ -205,7 +213,6 @@ class Ladybug(object):
             self.vx *= -1
         if self.y <= 0 or self.y >= game.height:
             self.vy *= -1
-
 
     def collision(self, player):
         if self.shape.colliderect(player):
