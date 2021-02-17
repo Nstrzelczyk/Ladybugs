@@ -41,9 +41,11 @@ class Board(object):
 
 class Text(object):
 
-    def __init__(self, board, text):
+    def __init__(self, board, text, height, width):
         self.board = board
         self.text = text
+        self.height = height
+        self.width = width
         # Font PyGame
         pygame.font.init()
         font_path = pygame.font.match_font('arial')
@@ -59,18 +61,15 @@ class Text(object):
         surface.blit(text, rect)
 
     def draw_on(self, surface):
-        """
-        Draws the indicated text at the indicated location.
-        """
-        height = self.board.surface.get_height()
-        width = self.board.surface.get_width()
-        self.draw_text(surface, self.text, width/2, height/2)
+        self.draw_text(surface, self.text, self.width, self.height)
+
 
 
 class Game(object):
     """
     Brings all the elements of the game together.
     """
+
     def __init__(self, width, height,display):
         pygame.init()
         self.width = width
@@ -80,8 +79,9 @@ class Game(object):
         self.player1 = Player(x=width/2, y=height/2)
         self.player_start = Player(x=width/3, y=height/4)
         self.bug_start = Ladybug(x=width*2/3, y=height/4, vx=0, vy=0)
-        self.start_text = Text(self.board, "Press SPACE to start")
-        self.end_text = Text(self.board, "Game over\nPress SPACE to start")
+        self.start_text = Text(self.board, "Press SPACE to start", self.width/2, self.height/2)
+        self.end_text = Text(self.board, "Game over\nPress SPACE to start", self.width/2, self.height/2)
+        self.judge = Judge(self.board, 100, 100)
         self.invasion = []
         for i in range(5):
             self.bug = Ladybug(x=random.randint(0, self.width - 50), y=random.randint(50, self.height - 50),
@@ -95,7 +95,7 @@ class Game(object):
     def run(self):
         pygame.key.set_repeat(50, 25)
         """
-        Main program loop.
+            Main program loop.
         """
         while not self.handle_events():
             if self.display == "Menu":
@@ -105,16 +105,20 @@ class Game(object):
                     self.start_text
                 )
             elif self.display == "Play game":
+                for self.ladybug in self.invasion:
+                    self.ladybug.move()
+                    # self.ladybug.collision(self.player1.shape)
+                    if self.bug.collision(self.player1.shape):
+                        self.display = "End"
                 self.board.draw(
                     self.player1,
                     self.invasion[0],
                     self.invasion[1],
                     self.invasion[2],
                     self.invasion[3],
-                    self.invasion[4]
+                    self.invasion[4],
+                    self.judge
                 )
-                for self.Ladybug in self.invasion:
-                    self.Ladybug.move()
                 pygame.time.wait(10)
             elif self.display == "End":
                 self.board.draw(
@@ -158,8 +162,8 @@ class Game(object):
                     pygame.quit()
                     quit()
 
-        if self.bug.collision(self.player1.shape):
-            self.display = "End"
+        # if self.bug.collision(self.player1.shape):
+        #     self.display = "End"
 
     def blit(self, graphics, param):
         pass
@@ -197,14 +201,6 @@ class Ladybug(object):
 
     def draw_on(self, surface):
         surface.blit(self.graphics, (self.x, self.y))
-        # if self.x < self.width:
-        #     self.x = self.width/2
-        # elif self.x > game.width - self.width/2:
-        #     self.x = game.width - self.width/2
-        # elif self.y < self.height:
-        #     self.y = self.height/2
-        # elif self.y > game.height - self.height/2:
-        #     self.y = game.height - self.height/2
 
     def move(self):
         self.x += self.vx
@@ -219,8 +215,45 @@ class Ladybug(object):
             return True
         else:
             return False
-#
-# class Judge():
+
+
+class Judge(object):
+    """
+       Judge games.
+    """
+
+    def __init__(self, board, x, y):
+        self.score = [0, 0]
+        self.board = board
+        self.text = "Player: {}".format(self.score[0])
+        self.x = x
+        self.y = y
+
+    # def update_score(self, args*):
+        """
+        Allocates the points and brings the ball to its original position.
+        """
+        # if self.ball.rect.y <= self.ball.height:
+        #     self.score[0] += 1
+        #     self.ball.reset()
+        # elif self.ball.rect.y >= board_height - self.ball.height:
+        #     self.score[1] += 1
+        #     self.ball.reset()
+
+    # def draw_text(self):
+    #     """
+    #     Draws the indicated text at the indicated location
+    #     """
+    #     self.text = Text
+
+    def draw_on(self, surface):
+        """
+        Draws the indicated text at the indicated location.
+        """
+        # height = self.board.surface.get_height()
+        # self.update_score()
+        # width = self.board.surface.get_width()
+        self.text = Text(surface, self.text, self.x, self.y)
 
 
 # This part should always be at the end of the module, we want to start our game only after all classes are declared.
